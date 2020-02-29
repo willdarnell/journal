@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:journal/widgets/drawer.dart';
 
 
-class JournalEntry extends StatelessWidget {
+class JournalEntryView extends StatelessWidget {
   
   static final routeName = 'alpha';
   

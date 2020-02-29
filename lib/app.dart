@@ -4,6 +4,7 @@ import 'package:journal/screens/journal_entry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:journal/screens/journal_form.dart';
+import 'package:journal/models/journal.dart';
 
 
 
@@ -11,7 +12,7 @@ class App extends StatefulWidget {
   
   static final routes = {
     HomePage.routeName: (context) => HomePage(),
-    JournalEntry.routeName: (context) => JournalEntry(),
+    JournalEntryView.routeName: (context) => JournalEntryView(),
     JournalForm.routeName: (context) => JournalForm()
   };
 
@@ -20,11 +21,11 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  bool _dark = false;
 
   @override
   void initState() {
     super.initState();
+
   }
 
   
