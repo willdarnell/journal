@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:journal/screens/home_page.dart';
 import 'package:journal/screens/journal_entry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
+
 
 class App extends StatefulWidget {
   
@@ -20,27 +22,24 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    _getTheme();
   }
 
-  _getTheme() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _dark = (prefs.getBool('dark') ?? true);
-    });
-  }
-  _setTheme() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _dark = (prefs.getBool('dark') ? true: false);
-      prefs.setBool('dark', _dark);
-    });
-  }
+  
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        routes: App.routes, 
-      );
+    return new DynamicTheme(
+      defaultBrightness: Brightness.light,
+      data: (brightness) => new ThemeData(
+        primarySwatch: Colors.indigo,
+        brightness: brightness,
+      ),
+      themedWidgetBuilder: (context, theme) {
+        return new MaterialApp(
+          title: 'Flutter Demo',
+          theme: theme,
+          routes: App.routes,
+        );
+      }
+    );
   }
 }
 

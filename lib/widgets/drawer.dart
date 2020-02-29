@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
+
+
 
 
 class MyDrawer extends StatefulWidget {
@@ -8,20 +11,28 @@ class MyDrawer extends StatefulWidget {
 }
 
 class _MyDrawerState extends State<MyDrawer> {
-
-  getSharedPref() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool _dark = prefs.getBool('dark');
+  bool _dark = false;
+  
+  @override 
+  bool _getValue(){
+    if (DynamicTheme.of(context).brightness == Brightness.dark) {
+        _dark = true;
+    }
+    else {
+      _dark = false;
+    }
     return _dark;
   }
-  _setTheme() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      bool _dark = (prefs.getBool('dark') ? true: false);
-      prefs.setBool('dark', _dark);
-    });
+  void changeBrightness() {
+    DynamicTheme.of(context).setBrightness(Theme.of(context).brightness == Brightness.dark? Brightness.light: Brightness.dark);
+    if (DynamicTheme.of(context).brightness == Brightness.dark) {
+        _dark = true;
+    }
+    else {
+      _dark = false;
+    }
   }
-  @override 
+  
   Widget build(BuildContext context) {
     return Drawer(
   // Add a ListView to the drawer. This ensures the user can scroll
@@ -39,8 +50,8 @@ class _MyDrawerState extends State<MyDrawer> {
       ),
       SwitchListTile(
         title: Text('Dark Mode'),
-        value: getSharedPref(),
-        onChanged: (value) { setState(() { _setTheme(); } );},
+        value: _getValue(),
+        onChanged: (value) { setState(() { changeBrightness();  } );},
 
       )]));
       }
