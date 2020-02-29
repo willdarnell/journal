@@ -3,13 +3,16 @@ import 'package:journal/screens/home_page.dart';
 import 'package:journal/screens/journal_entry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
+import 'package:journal/screens/journal_form.dart';
+
 
 
 class App extends StatefulWidget {
   
   static final routes = {
     HomePage.routeName: (context) => HomePage(),
-    JournalEntry.routeName: (context) => JournalEntry()
+    JournalEntry.routeName: (context) => JournalEntry(),
+    JournalForm.routeName: (context) => JournalForm()
   };
 
   @override
