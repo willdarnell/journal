@@ -99,6 +99,7 @@ class _HomePageState extends State<HomePage> {
     );
     }
     else {
+      if (journal.journalEntries.isNotEmpty){
       return Row(
         children: <Widget>[
           Flexible(child: Material(
@@ -125,14 +126,14 @@ class _HomePageState extends State<HomePage> {
     )],
       );
     }
-    
+    }
   }
 
   FloatingActionButton button(BuildContext context) {
     return FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () async{ 
-         //await deleteDatabase('journal.db');
+         await deleteDatabase('journal.db');
 
           displayAlpha(context); }
       );
