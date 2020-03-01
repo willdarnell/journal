@@ -33,7 +33,7 @@ Container details(BuildContext context, List<JournalEntry> list, int index){
   return Container(
     child: ListTile(
       title: Text(list[index].title),
-      subtitle: Text(list[index].body),
+      subtitle: Row(children: <Widget> [Text(list[index].body, textAlign: TextAlign.left,), Spacer(), Text('Rating: ' + list[index].rating.toString(), textAlign: TextAlign.right,)]),
 
     )
   );

@@ -5,7 +5,10 @@ import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:journal/screens/home_page.dart';
+import 'package:flutter/services.dart';
 
+
+const CREATE_TABLE_PATH = 'lib/assets/schema_1.sql.txt';
 
 class JournalEntryFields {
   String title;
@@ -102,8 +105,9 @@ class _JournalFormState extends State<JournalForm> {
                     journalEntryFields.dateTime = now;
                     _formKey.currentState.save();
                     //need to save to database here
+                      String schema = await rootBundle.loadString(CREATE_TABLE_PATH);
 
-                    final Database database = await createDatabase();
+                    final Database database = await createDatabase(schema);
 
 
                     await database.transaction( (txn) async {
@@ -122,10 +126,10 @@ class _JournalFormState extends State<JournalForm> {
       ),
     );
   }
-  Future<Database> createDatabase() async {
+  Future<Database> createDatabase(String query) async {
     final Database database = await openDatabase(
       'journal.db', version: 1, onCreate: (Database db, int version) async {
-        await db.execute('CREATE TABLE IF NOT EXISTS journal_entries(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, rating INTEGER NOT NULL, date TEXT NOT NULL)');
+        await db.execute(query);
       }
     );
     return database;

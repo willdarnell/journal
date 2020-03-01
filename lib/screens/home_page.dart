@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:journal/screens/journal_entry.dart';
 import 'package:journal/screens/journal_form.dart';
 import 'package:journal/widgets/drawer.dart';
@@ -10,6 +11,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:intl/intl.dart';
 
 
+const CREATE_TABLE_PATH = 'lib/assets/schema_1.sql.txt';
 
 class HomePage extends StatefulWidget {
   
@@ -32,7 +34,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void loadJournal() async {
-    final Database database = await createDatabase();
+    String schema = await rootBundle.loadString(CREATE_TABLE_PATH);
+    final Database database = await createDatabase(schema);
     List<Map> journalRecords = await journalRecordsFunction(database);
     final journalEntries = journalRecords.map( (record) {
       return JournalEntry(
@@ -92,7 +95,7 @@ class _HomePageState extends State<HomePage> {
     return FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () async{ 
-         
+         await deleteDatabase('journal.db');
 
           displayAlpha(context); }
       );
@@ -106,10 +109,10 @@ class _HomePageState extends State<HomePage> {
     Navigator.pushNamed(context, JournalEntryView.routeName, arguments: JournalDetails(journal.journalEntries, index));
   } 
 
-  Future<Database> createDatabase() async {
+  Future<Database> createDatabase(String query) async {
     final Database database = await openDatabase(
       'journal.db', version: 1, onCreate: (Database db, int version) async {
-        await db.execute('CREATE TABLE IF NOT EXISTS journal_entries(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, rating INTEGER NOT NULL, date TEXT NOT NULL)');
+        await db.execute(query);
       }
     );
     return database;
