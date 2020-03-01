@@ -95,12 +95,13 @@ class _JournalFormState extends State<JournalForm> {
               ),
               RaisedButton(
                 onPressed: () async {
+
                   if (_formKey.currentState.validate()){
                     var now = new DateTime.now();
                     journalEntryFields.dateTime = now;
                     _formKey.currentState.save();
                     //need to save to database here
-                    await deleteDatabase('journal.db');
+
                     final Database database = await openDatabase(
                       'journal.db', version: 1, onCreate: (Database db, int version) async {
                         await db.execute('CREATE TABLE IF NOT EXISTS journal_entries(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, rating INTEGER NOT NULL, date TEXT NOT NULL)');

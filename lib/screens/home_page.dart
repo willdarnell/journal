@@ -73,6 +73,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   ListView listView(BuildContext context){
+    loadJournal();
     return ListView.builder(
       padding: EdgeInsets.all(8),
       itemCount: journal.journalEntries.length,
@@ -92,7 +93,10 @@ class _HomePageState extends State<HomePage> {
   FloatingActionButton button(BuildContext context) {
     return FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () { displayAlpha(context); }
+        onPressed: () async{ 
+         
+
+          displayAlpha(context); }
       );
   }
 
