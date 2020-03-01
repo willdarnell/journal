@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
       return Text("Journal Entries");
     }
   }
-
+  @override
   Widget build(BuildContext context) {
     if (journal == null) {
       return Scaffold(

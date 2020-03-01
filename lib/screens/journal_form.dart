@@ -109,7 +109,7 @@ class _JournalFormState extends State<JournalForm> {
 
                     await database.transaction( (txn) async {
                       await txn.rawInsert('INSERT INTO journal_entries(title, body, rating, date) VALUES(?, ?, ?, ?)',
-                      [journalEntryFields.title, journalEntryFields.body, journalEntryFields.rating, journalEntryFields.dateTime]
+                      [journalEntryFields.title, journalEntryFields.body, journalEntryFields.rating, journalEntryFields.dateTime.toString()]
                       );
                     });
                     await database.close();
