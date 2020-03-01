@@ -4,6 +4,7 @@ import 'package:journal/models/journal.dart';
 import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:journal/screens/home_page.dart';
 
 
 class JournalEntryFields {
@@ -102,16 +103,11 @@ class _JournalFormState extends State<JournalForm> {
                     _formKey.currentState.save();
                     //need to save to database here
 
-                    final Database database = await openDatabase(
-                      'journal.db', version: 1, onCreate: (Database db, int version) async {
-                        await db.execute('CREATE TABLE IF NOT EXISTS journal_entries(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, rating INTEGER NOT NULL, date TEXT NOT NULL)');
-                      }
-                    );
+                    final Database database = await createDatabase();
+
 
                     await database.transaction( (txn) async {
-                      await txn.rawInsert('INSERT INTO journal_entries(title, body, rating, date) VALUES(?, ?, ?, ?)',
-                      [journalEntryFields.title, journalEntryFields.body, journalEntryFields.rating, journalEntryFields.dateTime.toString()]
-                      );
+                      insert(txn);
                     });
                     await database.close();
                     Navigator.of(context).pop();
@@ -125,5 +121,18 @@ class _JournalFormState extends State<JournalForm> {
         ),
       ),
     );
+  }
+  Future<Database> createDatabase() async {
+    final Database database = await openDatabase(
+      'journal.db', version: 1, onCreate: (Database db, int version) async {
+        await db.execute('CREATE TABLE IF NOT EXISTS journal_entries(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, rating INTEGER NOT NULL, date TEXT NOT NULL)');
+      }
+    );
+    return database;
+  }
+  Future insert(txn) async {
+    await txn.rawInsert('INSERT INTO journal_entries(title, body, rating, date) VALUES(?, ?, ?, ?)',
+                      [journalEntryFields.title, journalEntryFields.body, journalEntryFields.rating, journalEntryFields.dateTime.toString()]
+                      );
   }
 }

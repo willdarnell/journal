@@ -30,12 +30,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   void loadJournal() async {
-    final Database database = await openDatabase(
-      'journal.db', version: 1, onCreate: (Database db, int version) async {
-        await db.execute('CREATE TABLE IF NOT EXISTS journal_entries(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, rating INTEGER NOT NULL, date TEXT NOT NULL)');
-      }
-    );
-    List<Map> journalRecords = await database.rawQuery('SELECT * FROM journal_entries');
+    final Database database = await createDatabase();
+    List<Map> journalRecords = await journalRecordsFunction(database);
     final journalEntries = journalRecords.map( (record) {
       return JournalEntry(
         record['id'],
@@ -106,5 +102,18 @@ class _HomePageState extends State<HomePage> {
 
   void displayEntry(BuildContext context, Journal journal, index) {
     Navigator.pushNamed(context, JournalEntryView.routeName, arguments: JournalDetails(journal.journalEntries, index));
+  } 
+
+  Future<Database> createDatabase() async {
+    final Database database = await openDatabase(
+      'journal.db', version: 1, onCreate: (Database db, int version) async {
+        await db.execute('CREATE TABLE IF NOT EXISTS journal_entries(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, rating INTEGER NOT NULL, date TEXT NOT NULL)');
+      }
+    );
+    return database;
+  }
+  Future<List<Map>> journalRecordsFunction (database) async{
+    List<Map> query = await database.rawQuery('SELECT * FROM journal_entries');
+    return query;
   }
 }
