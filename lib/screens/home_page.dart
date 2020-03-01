@@ -7,6 +7,8 @@ import 'dart:core';
 import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:intl/intl.dart';
+
 
 
 class HomePage extends StatefulWidget {
@@ -76,7 +78,7 @@ class _HomePageState extends State<HomePage> {
       itemBuilder: (BuildContext context, int index) {
         return ListTile(
           title: Text(journal.journalEntries[index].title),
-          subtitle: Text((journal.journalEntries[index].date).toString()),
+          subtitle: Text(DateFormat.yMMMMEEEEd().format(journal.journalEntries[index].date)),
           onTap: () {
             displayEntry(context, journal, index);
 

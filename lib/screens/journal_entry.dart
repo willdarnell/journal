@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:journal/models/journal.dart';
 import 'package:journal/widgets/drawer.dart';
 import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+
 
 
 class JournalDetails {
@@ -21,7 +23,7 @@ class JournalEntryView extends StatelessWidget {
     return Scaffold(
       endDrawer: MyDrawer(),
       appBar: AppBar(
-        title: Text(journal.journalEntries[journal.index].date.toString()),
+        title: Text(DateFormat.yMMMMEEEEd().format(journal.journalEntries[journal.index].date)),
       ),
       body: details(context, journal.journalEntries, journal.index));
   }
