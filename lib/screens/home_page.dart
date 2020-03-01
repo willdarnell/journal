@@ -22,25 +22,27 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       endDrawer: MyDrawer(),
       appBar: AppBar(title: _getTitle(journal),),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [label(context), button(context)]
-        )
-      )
+      body: listView(context),
+      floatingActionButton: button(context),
     );
   }
   
-
- 
-  Widget label(BuildContext context) {
-    return Text('Navigation HomePage',
+  
+  ListView listView(BuildContext context){
+    return ListView.builder(
+      padding: EdgeInsets.all(8),
+      itemCount: journal.journalEntries.length,
+      itemBuilder: (BuildContext context, int index) {
+        return ListTile(
+          title: Text(journal.journalEntries[index].title),
+        );
+      },
     );
   }
   
-  Widget button(BuildContext context) {
-    return RaisedButton(
-        child: Text('Click Me!'),
+  FloatingActionButton button(BuildContext context) {
+    return FloatingActionButton(
+        child: Icon(Icons.add),
         onPressed: () { displayAlpha(context); }
       );
   }
