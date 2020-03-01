@@ -12,6 +12,8 @@ import 'package:intl/intl.dart';
 
 
 const CREATE_TABLE_PATH = 'lib/assets/schema_1.sql.txt';
+int wideIndex;
+
 
 class HomePage extends StatefulWidget {
   
@@ -24,6 +26,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Journal journal;
+  
 
   
 
@@ -60,6 +63,10 @@ class _HomePageState extends State<HomePage> {
   }
   @override
   Widget build(BuildContext context) {
+    var screenSide = MediaQuery.of(context).size;
+    var width = screenSide.width;
+    final bool useMobile = width < 500;
+
     if (journal == null) {
       return Scaffold(
         body: Center(child: CircularProgressIndicator()));
@@ -68,14 +75,15 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       endDrawer: MyDrawer(),
       appBar: AppBar(title: _getTitle(journal),),
-      body: listView(context),
+      body: listView(context, useMobile),
       floatingActionButton: button(context),
     );}
   }
 
-  ListView listView(BuildContext context){
+  Widget listView(BuildContext context, bool mobile){
     loadJournal();
-    return ListView.builder(
+    if (mobile){
+      return ListView.builder(
       padding: EdgeInsets.all(8),
       itemCount: journal.journalEntries.length,
       itemBuilder: (BuildContext context, int index) {
@@ -89,18 +97,49 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+    }
+    else {
+      return Row(
+        children: <Widget>[
+          Flexible(child: Material(
+            elevation: 4.0,
+            child: ListView.builder(
+          padding: EdgeInsets.all(8),
+          itemCount: journal.journalEntries.length,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              title: Text(journal.journalEntries[index].title),
+              subtitle: Text(DateFormat.yMMMMEEEEd().format(journal.journalEntries[index].date)),
+              onTap: () {setIndex(index); },
+            );
+          },
+    ))), 
+    Flexible(
+      child: ListTile(
+        title: Text(journal.journalEntries[wideIndex == null ? 0 : wideIndex].title),
+        subtitle: Row(
+          children: <Widget>[
+          Text(journal.journalEntries[wideIndex == null ? 0 : wideIndex].body), Spacer(), Text('Rating: ' + journal.journalEntries[wideIndex == null ? 0 : wideIndex].rating.toString(), textAlign: TextAlign.right,)],
+      ),
+    )
+    )],
+      );
+    }
+    
   }
 
   FloatingActionButton button(BuildContext context) {
     return FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () async{ 
-         await deleteDatabase('journal.db');
+         //await deleteDatabase('journal.db');
 
           displayAlpha(context); }
       );
   }
-
+  void setIndex(int index){
+    wideIndex = index;
+  }
   void displayAlpha(BuildContext context) {
     Navigator.pushNamed(context, JournalForm.routeName);
   }
