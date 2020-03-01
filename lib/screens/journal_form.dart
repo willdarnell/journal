@@ -1,6 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:journal/widgets/drawer.dart';
+import 'package:journal/models/journal.dart';
+import 'dart:async';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
+
+class JournalEntryFields {
+  String title;
+  String body;
+  DateTime dateTime;
+  int rating;
+  String toString() {
+    return 'Title: $title, Body: $body, Time: $dateTime, Rating: $rating';
+  }
+  }
 
 class JournalForm extends StatefulWidget {
   
@@ -17,6 +31,7 @@ class _JournalFormState extends State<JournalForm> {
   // Note: This is a `GlobalKey<FormState>`,
   // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
+  final journalEntryFields = JournalEntryFields();
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +51,7 @@ class _JournalFormState extends State<JournalForm> {
                   labelText: 'Title', border: OutlineInputBorder()
                 ),
                 onSaved: (value) {
-
+                  journalEntryFields.title = value;
                 },
                 validator: (value) {
                   if (value.isEmpty) {
@@ -52,7 +67,7 @@ class _JournalFormState extends State<JournalForm> {
                   labelText: 'Body', border: OutlineInputBorder()
                 ),
                 onSaved: (value) {
-
+                  journalEntryFields.body = value;
                 },
                 validator: (value) {
                   if (value.isEmpty) {
@@ -69,7 +84,7 @@ class _JournalFormState extends State<JournalForm> {
                 ),
                 keyboardType: TextInputType.number,
                 onSaved: (value) {
-
+                  journalEntryFields.rating = int.parse(value);
                 },
                 validator: (value) {
                   if (int.parse(value) < 1 || int.parse(value) > 4) {
@@ -79,14 +94,31 @@ class _JournalFormState extends State<JournalForm> {
                 },
               ),
               RaisedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState.validate()){
+                    var now = new DateTime.now();
+                    journalEntryFields.dateTime = now;
                     _formKey.currentState.save();
+                    //need to save to database here
+                    await deleteDatabase('journal.db');
+                    final Database database = await openDatabase(
+                      'journal.db', version: 1, onCreate: (Database db, int version) async {
+                        await db.execute('CREATE TABLE IF NOT EXISTS journal_entries(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, rating INTEGER NOT NULL, date TEXT NOT NULL)');
+                      }
+                    );
+
+                    await database.transaction( (txn) async {
+                      await txn.rawInsert('INSERT INTO journal_entries(title, body, rating, date) VALUES(?, ?, ?, ?)',
+                      [journalEntryFields.title, journalEntryFields.body, journalEntryFields.rating, journalEntryFields.dateTime]
+                      );
+                    });
+                    await database.close();
                     Navigator.of(context).pop();
                   }
                 },
                 child: Text('Save Entry'),
-                )
+                ),
+                
             ],
           ),
         ),
