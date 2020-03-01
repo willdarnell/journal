@@ -67,12 +67,13 @@ class _JournalFormState extends State<JournalForm> {
                 decoration: InputDecoration(
                   labelText: 'Rating', border: OutlineInputBorder()
                 ),
+                keyboardType: TextInputType.number,
                 onSaved: (value) {
 
                 },
                 validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text';
+                  if (int.parse(value) < 1 || int.parse(value) > 4) {
+                    return 'Please enter a number between 1 and 4';
                   }
                   return null;
                 },
