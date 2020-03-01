@@ -9,11 +9,46 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   
  
   static final routeName = '/';
-  Journal journal = Journal([JournalEntry(1, "Farting in your mouth", "doublefarts", 1, DateTime(2020, 2, 2)), JournalEntry(1, "Farting in your ass", "doublefarts", 1, DateTime(2020, 2, 2))]);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Journal journal;
+
+  
+
+  @override
+  void initState() {
+    super.initState();
+    loadJournal();
+  }
+
+  void loadJournal() async {
+    final Database database = await openDatabase(
+      'journal.db', version: 1, onCreate: (Database db, int version) async {
+        await db.execute('CREATE TABLE IF NOT EXISTS journal_entries(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, rating INTEGER NOT NULL, date TEXT NOT NULL)');
+      }
+    );
+    List<Map> journalRecords = await database.rawQuery('SELECT * FROM journal_entries');
+    final journalEntries = journalRecords.map( (record) {
+      return JournalEntry(
+        record['id'],
+        record['title'],
+        record['body'],
+        record['rating'],
+        DateTime.parse(record['date'])
+      );
+    }).toList();
+    setState(() {
+      journal = Journal(journalEntries);
+    });
+  }
   Text _getTitle(object) {
     if (object.journalEntries.isEmpty){
       return Text('Welcome');
@@ -22,17 +57,21 @@ class HomePage extends StatelessWidget {
       return Text("Journal Entries");
     }
   }
-  @override
+
   Widget build(BuildContext context) {
+    if (journal == null) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()));
+    }
+    else{
     return Scaffold(
       endDrawer: MyDrawer(),
       appBar: AppBar(title: _getTitle(journal),),
       body: listView(context),
       floatingActionButton: button(context),
-    );
+    );}
   }
-  
-  
+
   ListView listView(BuildContext context){
     return ListView.builder(
       padding: EdgeInsets.all(8),
@@ -49,14 +88,14 @@ class HomePage extends StatelessWidget {
       },
     );
   }
-  
+
   FloatingActionButton button(BuildContext context) {
     return FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () { displayAlpha(context); }
       );
   }
-  
+
   void displayAlpha(BuildContext context) {
     Navigator.pushNamed(context, JournalForm.routeName);
   }
@@ -64,6 +103,4 @@ class HomePage extends StatelessWidget {
   void displayEntry(BuildContext context, Journal journal, index) {
     Navigator.pushNamed(context, JournalEntryView.routeName, arguments: JournalDetails(journal.journalEntries, index));
   }
-  
-  
 }
